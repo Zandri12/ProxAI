@@ -18,11 +18,12 @@ class UserManagementController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $users = User::with('roles')->paginate(10);
+            $users = User::with('roles')->get();
             
             return response()->json([
                 'success' => true,
-                'data' => $users
+                'data' => $users,
+                'message' => 'Users retrieved successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([

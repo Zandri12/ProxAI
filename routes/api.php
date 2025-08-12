@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\RoleManagementController;
+use App\Http\Controllers\PermissionManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,10 +47,26 @@ Route::middleware('auth:sanctum')->get('/auth-test', function (Request $request)
 
 // User Management Routes with Sanctum (session-based auth)
 Route::middleware('auth:sanctum')->group(function () {
+    // Users
     Route::get('/users', [UserManagementController::class, 'index']);
     Route::post('/users', [UserManagementController::class, 'store']);
     Route::get('/users/{user}', [UserManagementController::class, 'show']);
     Route::put('/users/{user}', [UserManagementController::class, 'update']);
     Route::delete('/users/{user}', [UserManagementController::class, 'destroy']);
-    Route::get('/roles', [UserManagementController::class, 'getRoles']);
+    
+    // Roles
+    Route::get('/roles', [RoleManagementController::class, 'index']);
+    Route::post('/roles', [RoleManagementController::class, 'store']);
+    Route::get('/roles/{role}', [RoleManagementController::class, 'show']);
+    Route::put('/roles/{role}', [RoleManagementController::class, 'update']);
+    Route::delete('/roles/{role}', [RoleManagementController::class, 'destroy']);
+    Route::get('/roles-permissions', [RoleManagementController::class, 'getPermissions']);
+    
+    // Permissions
+    Route::get('/permissions', [PermissionManagementController::class, 'index']);
+    Route::post('/permissions', [PermissionManagementController::class, 'store']);
+    Route::get('/permissions/{permission}', [PermissionManagementController::class, 'show']);
+    Route::put('/permissions/{permission}', [PermissionManagementController::class, 'update']);
+    Route::delete('/permissions/{permission}', [PermissionManagementController::class, 'destroy']);
+    Route::get('/permissions/module/{module}', [PermissionManagementController::class, 'getByModule']);
 });

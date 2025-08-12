@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Role;
 
 class RoleSeeder extends Seeder
 {
@@ -15,35 +14,45 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             [
-                'name' => 'Super Administrator',
+                'name' => 'Super Admin',
                 'slug' => 'super-admin',
-                'description' => 'Full access to all features and settings',
-                'is_active' => true,
+                'description' => 'Full system access with all permissions',
+                'is_active' => true
             ],
             [
                 'name' => 'Administrator',
-                'slug' => 'admin',
-                'description' => 'Administrative access to manage users, roles, and permissions',
-                'is_active' => true,
+                'slug' => 'administrator',
+                'description' => 'System administrator with most permissions',
+                'is_active' => true
             ],
             [
-                'name' => 'Developer',
-                'slug' => 'developer',
-                'description' => 'Developer access with technical permissions',
-                'is_active' => true,
+                'name' => 'User Manager',
+                'slug' => 'user-manager',
+                'description' => 'Can manage users and basic roles',
+                'is_active' => true
             ],
             [
-                'name' => 'User',
-                'slug' => 'user',
-                'description' => 'Standard user with basic permissions',
-                'is_active' => true,
+                'name' => 'Role Manager',
+                'slug' => 'role-manager',
+                'description' => 'Can manage roles and permissions',
+                'is_active' => true
             ],
+            [
+                'name' => 'Regular User',
+                'slug' => 'regular-user',
+                'description' => 'Standard user with basic access',
+                'is_active' => true
+            ],
+            [
+                'name' => 'Guest',
+                'slug' => 'guest',
+                'description' => 'Limited access user',
+                'is_active' => false
+            ]
         ];
 
         foreach ($roles as $role) {
             Role::create($role);
         }
-
-        $this->command->info('Roles seeded successfully!');
     }
 }

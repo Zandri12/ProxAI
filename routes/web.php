@@ -43,6 +43,16 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('PermissionManagement/Index');
     })->name('permission-management.index');
     
+    // Test DataTable Route
+    Route::get('/test-datatable', function () {
+        return Inertia::render('TestDataTable');
+    })->name('test-datatable.index');
+    
+    // Simple Test Route
+    Route::get('/simple-test', function () {
+        return Inertia::render('SimpleTest');
+    })->name('simple-test.index');
+    
     // Dashboard API Route
     Route::get('/dashboard-data', [DashboardController::class, 'index']);
     

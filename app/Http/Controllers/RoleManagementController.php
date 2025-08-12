@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 class RoleManagementController extends Controller
 {
     /**
-     * Display a listing of roles.
+     * Display a listing of roles with permissions
      */
     public function index(): JsonResponse
     {
@@ -20,53 +20,56 @@ class RoleManagementController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => $roles
+                'data' => $roles,
+                'message' => 'Roles retrieved successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error loading roles: ' . $e->getMessage()
+                'message' => 'Error retrieving roles: ' . $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Store a newly created role.
+     * Store a newly created role
      */
     public function store(Request $request): JsonResponse
     {
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255|unique:roles',
-                'display_name' => 'required|string|max:255',
+                'slug' => 'required|string|max:255|unique:roles',
                 'description' => 'nullable|string',
-                'permissions' => 'array',
-                'permissions.*' => 'exists:permissions,id'
+                'is_active' => 'boolean',
+                'permission_ids' => 'array'
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
+                    'message' => 'Validation failed',
                     'errors' => $validator->errors()
                 ], 422);
             }
 
             $role = Role::create([
                 'name' => $request->name,
-                'display_name' => $request->display_name,
+                'slug' => $request->slug,
                 'description' => $request->description,
+                'is_active' => $request->is_active ?? true
             ]);
 
-            if ($request->has('permissions')) {
-                $role->permissions()->attach($request->permissions);
+            if ($request->has('permission_ids')) {
+                $role->permissions()->attach($request->permission_ids);
             }
 
             $role->load('permissions');
 
             return response()->json([
                 'success' => true,
-                'message' => 'Role created successfully',
-                'data' => $role
+                'data' => $role,
+                'message' => 'Role created successfully'
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -77,7 +80,7 @@ class RoleManagementController extends Controller
     }
 
     /**
-     * Display the specified role.
+     * Display the specified role
      */
     public function show(Role $role): JsonResponse
     {
@@ -86,53 +89,51 @@ class RoleManagementController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => $role
+                'data' => $role,
+                'message' => 'Role retrieved successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error loading role: ' . $e->getMessage()
+                'message' => 'Error retrieving role: ' . $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Update the specified role.
+     * Update the specified role
      */
     public function update(Request $request, Role $role): JsonResponse
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
-                'display_name' => 'required|string|max:255',
+                'name' => 'sometimes|required|string|max:255|unique:roles,name,' . $role->id,
+                'slug' => 'sometimes|required|string|max:255|unique:roles,slug,' . $role->id,
                 'description' => 'nullable|string',
-                'permissions' => 'array',
-                'permissions.*' => 'exists:permissions,id'
+                'is_active' => 'sometimes|boolean',
+                'permission_ids' => 'sometimes|array'
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
+                    'message' => 'Validation failed',
                     'errors' => $validator->errors()
                 ], 422);
             }
 
-            $role->update([
-                'name' => $request->name,
-                'display_name' => $request->display_name,
-                'description' => $request->description,
-            ]);
+            $role->update($request->only(['name', 'slug', 'description', 'is_active']));
 
-            if ($request->has('permissions')) {
-                $role->permissions()->sync($request->permissions);
+            if ($request->has('permission_ids')) {
+                $role->permissions()->sync($request->permission_ids);
             }
 
             $role->load('permissions');
 
             return response()->json([
                 'success' => true,
-                'message' => 'Role updated successfully',
-                'data' => $role
+                'data' => $role,
+                'message' => 'Role updated successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -143,22 +144,14 @@ class RoleManagementController extends Controller
     }
 
     /**
-     * Remove the specified role.
+     * Remove the specified role
      */
     public function destroy(Role $role): JsonResponse
     {
         try {
-            // Check if role is assigned to any users
-            if ($role->users()->count() > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cannot delete role that is assigned to users'
-                ], 422);
-            }
-
             $role->permissions()->detach();
             $role->delete();
-
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Role deleted successfully'
@@ -172,21 +165,22 @@ class RoleManagementController extends Controller
     }
 
     /**
-     * Get all permissions for role assignment.
+     * Get all permissions for role assignment
      */
     public function getPermissions(): JsonResponse
     {
         try {
-            $permissions = Permission::all();
+            $permissions = Permission::where('is_active', true)->get();
             
             return response()->json([
                 'success' => true,
-                'data' => $permissions
+                'data' => $permissions,
+                'message' => 'Permissions retrieved successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error loading permissions: ' . $e->getMessage()
+                'message' => 'Error retrieving permissions: ' . $e->getMessage()
             ], 500);
         }
     }

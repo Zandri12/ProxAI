@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -15,72 +14,77 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Admin User
+        // Create Super Admin
+        $superAdmin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin@proxa.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'is_active' => true
+        ]);
+
+        // Create Administrator
         $admin = User::create([
             'name' => 'Administrator',
-            'email' => 'admin@proxa.com',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
             'email_verified_at' => now(),
-            'password' => Hash::make('password123'),
-            'is_active' => true,
+            'is_active' => true
+        ]);
+
+        // Create User Manager
+        $userManager = User::create([
+            'name' => 'User Manager',
+            'email' => 'manager@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'is_active' => true
         ]);
 
         // Create Regular User
-        $john = User::create([
-            'name' => 'John Doe',
-            'email' => 'john@proxa.com',
+        $regularUser = User::create([
+            'name' => 'Regular User',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password'),
             'email_verified_at' => now(),
-            'password' => Hash::make('password123'),
-            'is_active' => true,
+            'is_active' => true
         ]);
 
-        // Create Another User
-        $jane = User::create([
-            'name' => 'Jane Smith',
-            'email' => 'jane@proxa.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('password123'),
-            'is_active' => true,
+        // Create Guest User (inactive)
+        $guestUser = User::create([
+            'name' => 'Guest User',
+            'email' => 'guest@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => null,
+            'is_active' => false
         ]);
 
-        // Create Developer User
-        $developer = User::create([
-            'name' => 'Developer',
-            'email' => 'dev@proxa.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('password123'),
-            'is_active' => true,
-        ]);
-
-        // Create Test User
-        $testUser = User::create([
-            'name' => 'Test User',
-            'email' => 'test@proxa.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('password123'),
-            'is_active' => true,
-        ]);
+        // Get roles
+        $superAdminRole = Role::where('slug', 'super-admin')->first();
+        $adminRole = Role::where('slug', 'administrator')->first();
+        $userManagerRole = Role::where('slug', 'user-manager')->first();
+        $regularUserRole = Role::where('slug', 'regular-user')->first();
+        $guestRole = Role::where('slug', 'guest')->first();
 
         // Assign roles to users
-        $adminRole = Role::where('slug', 'admin')->first();
-        $userRole = Role::where('slug', 'user')->first();
-        $developerRole = Role::where('slug', 'developer')->first();
-
+        if ($superAdminRole) {
+            $superAdmin->roles()->attach($superAdminRole->id);
+        }
+        
         if ($adminRole) {
-            $admin->roles()->attach($adminRole);
+            $admin->roles()->attach($adminRole->id);
         }
-
-        if ($userRole) {
-            $john->roles()->attach($userRole);
-            $jane->roles()->attach($userRole);
-            $testUser->roles()->attach($userRole);
+        
+        if ($userManagerRole) {
+            $userManager->roles()->attach($userManagerRole->id);
         }
-
-        if ($developerRole) {
-            $developer->roles()->attach($developerRole);
+        
+        if ($regularUserRole) {
+            $regularUser->roles()->attach($regularUserRole->id);
         }
-
-        $this->command->info('Users seeded successfully!');
-        $this->command->info('Default password for all users: password123');
-        $this->command->info('Roles assigned to users successfully!');
+        
+        if ($guestRole) {
+            $guestUser->roles()->attach($guestRole->id);
+        }
     }
 }
