@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@proxa.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password123'),
+            'is_active' => true,
         ]);
 
         // Create Regular User
@@ -29,6 +30,7 @@ class UserSeeder extends Seeder
             'email' => 'john@proxa.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password123'),
+            'is_active' => true,
         ]);
 
         // Create Another User
@@ -37,6 +39,7 @@ class UserSeeder extends Seeder
             'email' => 'jane@proxa.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password123'),
+            'is_active' => true,
         ]);
 
         // Create Developer User
@@ -45,6 +48,7 @@ class UserSeeder extends Seeder
             'email' => 'dev@proxa.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password123'),
+            'is_active' => true,
         ]);
 
         // Create Test User
@@ -53,6 +57,7 @@ class UserSeeder extends Seeder
             'email' => 'test@proxa.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password123'),
+            'is_active' => true,
         ]);
 
         // Assign roles to users

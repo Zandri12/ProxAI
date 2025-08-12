@@ -19,9 +19,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -42,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/permission-management', function () {
         return Inertia::render('PermissionManagement/Index');
     })->name('permission-management.index');
+    
+    // Dashboard API Route
+    Route::get('/dashboard-data', [DashboardController::class, 'index']);
     
     // API Routes for User Management (session-based auth)
     Route::prefix('api')->group(function () {
